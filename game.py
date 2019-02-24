@@ -77,8 +77,8 @@ class Round:
 
 
 class Hand:
-    def __init__(self, trump):
-        self.trump = trump
+    def __init__(self):
+        self.trump = None
 
         # Shuffle and divide cards
         cards = []
@@ -98,16 +98,18 @@ class Hand:
         self.current_round_number = 1
         self.rounds_played = []
 
+    def set_trump(self, trump):
+        self.trump = trump
+
     def start_round(self, starting_player):
         self.current_round = Round(starting_player)
 
     def play_card(self, player, card):
-        if verify_play(card, player.cards, player, self.current_round):
+        if verify_play(card, self.players[player].cards, player, self.current_round):
             self.current_round.cards_played[player] = card
             return True
         else:
             return False
-
 
     def print_cards(self, player):
         cards = self.players[player].cards
@@ -115,23 +117,37 @@ class Hand:
             card = cards[i]
             print(i, "-", map_suit(card.suit), card.value)
 
+    def print_table(self):
+        for i in range(4):
+            card = self.current_round.cards_played[i]
+            if card == 0:
+                print(i, 0)
+            else:
+                print(i, map_suit(card.suit), card.value)
+
 
 def main():
     game = Game()
     while game.hand <= 16:
-        trump = get_trump()
-        hand = Hand(trump)
+        hand = Hand()
         hand.start_round(game.currentPlayersTurn)
+        hand.print_cards(game.currentPlayersTurn)
+        trump = get_trump()
         for i in range(8):
             order = get_order(game.currentPlayersTurn)
             for player in order:
+                hand.print_table()
                 hand.print_cards(player)
                 while True:
-                    played_card = input("card")
+                    played_card = int(input("card"))
+                    played_card = hand.players[player].cards[played_card]
                     if hand.play_card(player, played_card):
                         break
                     else:
                         print("Invalid move!")
+
+            # Decide winner
+            # Reset hand
 
             # play game
             pass
