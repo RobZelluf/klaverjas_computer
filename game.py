@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from rules import verify_play
 
 values = ["7", "8", "9", "B", "V", "K", "10", "A"]
 suits = ["K", "S", "H", "R"]
@@ -36,10 +37,6 @@ def get_trump():
         return trump
     else:
         return get_trump()
-
-
-def verify_play(card, hand, player, round):
-    return True
 
 
 class Game:
