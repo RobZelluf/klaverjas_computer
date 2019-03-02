@@ -2,9 +2,6 @@ import numpy as np
 import random
 from rules import *
 
-values = ["7", "8", "9", "B", "V", "H", "10", "A"]
-suits = ["K", "S", "H", "R"]
-
 
 def map_suit(suit):
     if suit == "K":
@@ -65,11 +62,9 @@ class Game:
         self.team1_points = 0
         self.team2_points = 0
 
-    def add_points(self, player, points):
-        if player in [0, 2]:
-            self.team1_points += points
-        else:
-            self.team2_points += points
+    def add_points(self, points_team_1, points_team_2):
+        self.team1_points += points_team_1
+        self.team2_points += points_team_2
 
     def next_turn(self):
         self.currentPlayersTurn += 1
@@ -193,10 +188,15 @@ def main():
 
             winner = get_winner(hand.current_round.cards_played, trump, order[0])
             points = get_total_points(hand.current_round.cards_played, trump)
+            if i == 7:
+                points += 10
 
             hand.add_points(winner, points)
             hand.currentPlayersTurn = winner
             print(hand.team1_points, hand.team2_points)
+
+        game.add_points(hand.team1_points, hand.team2_points)
+        game.hand += 1
 
 
 main()
