@@ -88,22 +88,21 @@ class Player:
 
 class Card:
     def __init__(self, value, suit):
-        if value in values:
-            self.value = value
-        if suit in suits:
-            self.suit = suit
+        self.value = value
+        self.suit = suit
 
 
 class Round:
     def __init__(self, starting_player):
         self.starting_player = starting_player
         self.num_cards_played = 0
-        self.cards_played = [0] * 4
+        self.cards_played = [Card(0, 0)] * 4
 
 
 class Hand:
     def __init__(self, starting_player):
         self.trump = None
+        self.starting_player = starting_player
 
         # Shuffle and divide cards
         cards = []
@@ -143,7 +142,12 @@ class Hand:
         self.currentPlayersTurn = starting_player
 
     def play_card(self, player, card):
-        if verify_play(card, self.players[player].cards, player, self.current_round):
+        if player == self.current_round.starting_player:
+            self.current_round.cards_played[player] = card
+            self.players[player].cards.remove(card)
+            return True
+
+        if verify_play(card, self.players[player].cards, player, self.current_round, self.trump):
             self.current_round.cards_played[player] = card
             self.players[player].cards.remove(card)
             return True
@@ -159,7 +163,7 @@ class Hand:
     def print_table(self):
         for i in range(4):
             card = self.current_round.cards_played[i]
-            if card == 0:
+            if card.value == 0:
                 print(i, 0)
             else:
                 print(i, map_suit(card.suit), card.value)
@@ -171,6 +175,7 @@ def main():
         hand = Hand(game.currentPlayersTurn)
         hand.print_cards(game.currentPlayersTurn)
         trump = get_trump().capitalize()
+        hand.set_trump(trump)
         for i in range(8):
             hand.start_round(hand.currentPlayersTurn)
             order = get_order(hand.currentPlayersTurn)

@@ -38,6 +38,13 @@ def get_total_points(cards, trump):
 
 
 def get_highest_card(cards, trump):
+    valid_cards = []
+    for card in cards:
+        if card.value != 0:
+            valid_cards.append(card)
+
+    cards = valid_cards
+
     if trump:
         best_index = min([trump_order.index(card.value) for card in cards])
         best_card = [card for card in cards if trump_order.index(card.value) == best_index][0]
@@ -48,7 +55,44 @@ def get_highest_card(cards, trump):
     return best_card
 
 
-def verify_play(card, hand, player, round):
+def verify_play(card, hand_cards, player, round, trump):
+    starting_player = round.starting_player
+    leading_card = round.cards_played[starting_player]
+    leading_suit = leading_card.suit
+
+    # Check if leading suit is met
+    if card.suit != leading_suit:
+        if len([x for x in hand_cards if x.suit == leading_suit]) > 0:
+            return False
+
+        # If not, check if there should have been trumped
+        best_card = get_highest_card(round.cards_played, trump)
+        leading_player = round.cards_played.index(best_card)
+        if leading_player + player % 2 != 0:
+            if len([card for card in hand_cards if card.suit == trump]) > 0:
+                return
+
+        # Check whether under trumped when not needed
+        if card.suit == trump:
+
+            if trump in [card.suit for card in round.cards_played]:
+                if trump_order.index(card.value) > trump_order.index(best_card.value):
+                    if len([card for card in hand_cards if card.suit == trump]) > 1:
+                        for trump_card in [card for card in hand_cards if card.suit == trump]:
+                            if trump_order.index(trump_card.value) < trump_order.index(best_card.value):
+                                return False
+
+                        if len([card for card in hand_cards if card.suit == trump]) < len(hand_cards):
+                            return False
+
+    # Check if under_trumped while not needed
+    elif leading_suit == trump and card.suit == trump:
+        if trump_order.index(card.value) > trump_order.index(leading_card.value):
+            if len([x for x in hand_cards if x.suit == trump]) > 1:
+                for trump_card in hand_cards:
+                    if trump_order.index(trump_card.value) < trump_order.index(leading_card.value):
+                        return False
+
     return True
 
 
