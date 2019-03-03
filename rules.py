@@ -34,7 +34,10 @@ def get_card_points(card, trump):
         return normal_points[card.value]
 
 
-def get_index(card, lst=roem_order):
+def get_index(card, lst=None):
+    if lst is None:
+        lst = roem_order
+
     return lst.index(card.value)
 
 
@@ -46,27 +49,32 @@ def get_total_points(cards, trump):
     # -- ROEM -- #
     total_roem = 0
 
-    # Three in a row
+    # Three and four in a row
     for suit in suits:
         roem_cards = [card for card in cards if card.suit == suit]
         if len(roem_cards) >= 3:
-            print([card.value for card in roem_cards])
             roem_cards.sort(key=get_index)
-            print([card.value for card in roem_cards], "sorted")
             i = roem_order.index(roem_cards[0].value)
             if roem_cards[1].value == roem_order[i + 1] and roem_cards[2].value == roem_order[i + 2]:
                 total_roem += 20
-                print("3 in a row")
-            elif len(roem_cards) == 4:
-                if roem_cards[3].value == roem_order[i + 3]:
-                    total_roem += 30
-                    print("4 in a row")
+                if len(roem_cards) == 4:
+                    if roem_cards[3].value == roem_order[i + 3]:
+                        total_roem += 30
+
+                break
 
     # Stuk
     trump_cards = [card for card in cards if card.suit == trump]
-    if "H" in [card.suit for card in trump_cards] and "V" in [card.suit for card in trump_cards]:
+    if "H" in [card.value for card in trump_cards] and "V" in [card.value for card in trump_cards]:
         total_roem += 20
-        print("stuk!")
+
+    # Four figures
+    if len(list(set([card.value for card in cards]))) == 1:
+        if cards[0].value in normal_order[:4]:
+            total_roem += 100
+
+    if total_roem > 0:
+        print("Roem:", total_roem)
 
     return total + total_roem
 
@@ -94,20 +102,22 @@ def verify_play(card, hand_cards, player, round, trump):
     leading_card = round.cards_played[starting_player]
     leading_suit = leading_card.suit
 
+    best_card = get_highest_card(round.cards_played, trump)
+    best_player = round.cards_played.index(best_card)
+
     # Check if leading suit is met
     if card.suit != leading_suit:
         if len([x for x in hand_cards if x.suit == leading_suit]) > 0:
             return False
 
         # If not, check if there should have been trumped
-        best_card = get_highest_card(round.cards_played, trump)
-        leading_player = round.cards_played.index(best_card)
-        if leading_player + player % 2 != 0:
-            if len([card for card in hand_cards if card.suit == trump]) > 0:
-                return False
+        if card.suit != trump:
+            if (best_player + player) % 2 != 0:
+                if len([card for card in hand_cards if card.suit == trump]) > 0:
+                    return False
 
         # Check whether under trumped when not needed
-        if card.suit == trump:
+        else:
 
             if trump in [card.suit for card in round.cards_played]:
                 if trump_order.index(card.value) > trump_order.index(best_card.value):
@@ -118,6 +128,9 @@ def verify_play(card, hand_cards, player, round, trump):
 
                         if len([card for card in hand_cards if card.suit == trump]) < len(hand_cards):
                             return False
+
+                    if len([card for card in hand_cards if card.suit != trump]) > 1:
+                        return False
 
     # Check if under_trumped while not needed
     elif leading_suit == trump and card.suit == trump:

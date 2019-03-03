@@ -186,6 +186,7 @@ def main():
                     else:
                         print("Invalid move!")
 
+            hand.print_table()
             winner = get_winner(hand.current_round.cards_played, trump, order[0])
             points = get_total_points(hand.current_round.cards_played, trump)
             if i == 7:
