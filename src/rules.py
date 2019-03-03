@@ -79,7 +79,7 @@ def get_total_points(cards, trump):
     return total + total_roem
 
 
-def get_highest_card(cards, trump):
+def get_highest_card(cards, trump, leading_suit):
     valid_cards = []
     for card in cards:
         if card.value != 0:
@@ -87,10 +87,12 @@ def get_highest_card(cards, trump):
 
     cards = valid_cards
 
-    if trump:
+    if trump in [card.suit for card in cards]:
+        cards = [card for card in cards if card.suit == trump]
         best_index = min([trump_order.index(card.value) for card in cards])
         best_card = [card for card in cards if trump_order.index(card.value) == best_index][0]
     else:
+        cards = [card for card in cards if card.suit == leading_suit]
         best_index = min([normal_order.index(card.value) for card in cards])
         best_card = [card for card in cards if normal_order.index(card.value) == best_index][0]
 
@@ -102,7 +104,7 @@ def verify_play(card, hand_cards, player, round, trump):
     leading_card = round.cards_played[starting_player]
     leading_suit = leading_card.suit
 
-    best_card = get_highest_card(round.cards_played, trump)
+    best_card = get_highest_card(round.cards_played, trump, leading_suit)
     best_player = round.cards_played.index(best_card)
 
     # Check if leading suit is met
@@ -134,22 +136,21 @@ def verify_play(card, hand_cards, player, round, trump):
 
     # Check if under_trumped while not needed
     elif leading_suit == trump and card.suit == trump:
-        highest_card = get_highest_card(round.cards_played, trump)
-        if trump_order.index(card.value) > trump_order.index(highest_card.value):
+        if trump_order.index(card.value) > trump_order.index(best_card.value):
             if len([x for x in hand_cards if x.suit == trump]) > 1:
                 for trump_card in [card for card in hand_cards if card.suit == trump]:
-                    if trump_order.index(trump_card.value) < trump_order.index(highest_card.value):
+                    if trump_order.index(trump_card.value) < trump_order.index(best_card.value):
                         return False
 
     return True
 
 
 def get_winner(round, trump, starting_player):
-    leading_color = round[starting_player].suit
+    leading_suit = round[starting_player].suit
     if trump in [card.suit for card in round]:
-        highest_card = get_highest_card([card for card in round if card.suit == trump], True)
+        highest_card = get_highest_card([card for card in round if card.suit == trump], True, leading_suit)
     else:
-        highest_card = get_highest_card([card for card in round if card.suit == leading_color], False)
+        highest_card = get_highest_card([card for card in round if card.suit == leading_suit], False, leading_suit)
 
     winner = round.index(highest_card)
 

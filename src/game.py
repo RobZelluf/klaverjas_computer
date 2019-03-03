@@ -1,6 +1,5 @@
-import numpy as np
 import random
-from rules import *
+from src.rules import *
 
 
 def map_suit(suit):
@@ -200,4 +199,5 @@ def main():
         game.hand += 1
 
 
-main()
+if __name__ == '__main__':
+   main()
