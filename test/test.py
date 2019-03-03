@@ -157,3 +157,7 @@ class TestRoem(unittest.TestCase):
         self.assertEqual(get_total_points(cards_stuk, trump), 51)
         self.assertEqual(get_total_points(cards_stuk_row, trump), 81)
         self.assertEqual(get_total_points(cards_stuk_bigrow, trump), 107)
+
+
+if __name__ == '__main__':
+    unittest.main()
