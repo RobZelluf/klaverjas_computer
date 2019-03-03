@@ -193,6 +193,16 @@ def main():
 
             hand.add_points(winner, points)
             hand.currentPlayersTurn = winner
+
+            # TODO: Nat spelen
+
+            if hand.team1_points == 0:
+                hand.team2_points += 100
+                print("PIT for team 2!")
+            elif hand.team2_points == 0:
+                hand.team1_points += 100
+                print("PIT for team 1!")
+
             print(hand.team1_points, hand.team2_points)
 
         game.add_points(hand.team1_points, hand.team2_points)
