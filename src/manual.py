@@ -33,14 +33,16 @@ def main():
 
             # TODO: Nat spelen
 
-            if hand.team1_points == 0:
-                hand.team2_points += 100
-                print("PIT for team 2!")
-            elif hand.team2_points == 0:
-                hand.team1_points += 100
-                print("PIT for team 1!")
-
             print(hand.team1_points, hand.team2_points)
+
+        # TODO: no hands, not no points
+
+        if hand.team1_points == 0:
+            hand.team2_points += 100
+            print("PIT for team 2!")
+        elif hand.team2_points == 0:
+            hand.team1_points += 100
+            print("PIT for team 1!")
 
         game.add_points(hand.team1_points, hand.team2_points)
         game.hand += 1
