@@ -116,7 +116,9 @@ def verify_play(card, hand_cards, player, round, trump):
         if card.suit != trump:
             if (best_player + player) % 2 != 0:
                 if len([card for card in hand_cards if card.suit == trump]) > 0:
-                    return False
+                    for trump_card in [card for card in hand_cards if card.suit == trump]:
+                        if trump_order.index(trump_card.value) < trump_order.index(best_card.value):
+                            return False
 
         # Check whether under trumped when not needed
         else:
@@ -148,9 +150,9 @@ def verify_play(card, hand_cards, player, round, trump):
 def get_winner(round, trump, starting_player):
     leading_suit = round[starting_player].suit
     if trump in [card.suit for card in round]:
-        highest_card = get_highest_card([card for card in round if card.suit == trump], True, leading_suit)
+        highest_card = get_highest_card([card for card in round if card.suit == trump], trump, leading_suit)
     else:
-        highest_card = get_highest_card([card for card in round if card.suit == leading_suit], False, leading_suit)
+        highest_card = get_highest_card([card for card in round if card.suit == leading_suit], trump, leading_suit)
 
     winner = round.index(highest_card)
 

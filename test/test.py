@@ -1,5 +1,5 @@
 import unittest
-from src.game import Card, Round, Hand
+from src.game import Card, Round, Hand, get_order
 from src.rules import *
 import random
 
@@ -95,10 +95,12 @@ class TestRules(unittest.TestCase):
         for i in range(samples):
             trump = random.choice(suits)
             hand = Hand(0)
-            hand.start_round(0)
+            hand.set_trump(trump)
 
             for round_number in range(8):
-                for player in range(4):
+                hand.start_round(hand.currentPlayersTurn)
+                order = get_order(hand.currentPlayersTurn)
+                for player in order:
                     played = False
                     for card in hand.players[player].cards:
                         if hand.play_card(player, card):
@@ -108,6 +110,9 @@ class TestRules(unittest.TestCase):
 
                     if not played:
                         self.assertTrue(False)
+
+                winner = get_winner(hand.current_round.cards_played, trump, order[0])
+                hand.currentPlayersTurn = winner
 
         self.assertEqual(cards_played, samples * 8 * 4)
 
