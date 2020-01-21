@@ -51,7 +51,7 @@ def get_card(num_cards):
 
 class Game:
     def __init__(self):
-        self.hand = 1
+        self.hand = 0
         self.players = []
         for i in range(3):
             self.players.append(Player(i))
@@ -77,7 +77,7 @@ class Player:
         self.cards = []
 
     def give_cards(self, cards):
-        self.cards = cards
+        self.cards = sorted(cards, key=lambda x: (x.suit, x.value))
 
 
 class Card:

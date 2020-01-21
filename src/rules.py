@@ -41,7 +41,7 @@ def get_index(card, lst=None):
     return lst.index(card.value)
 
 
-def get_total_points(cards, trump):
+def get_total_points(cards, trump, print_roem=False):
     total = 0
     for card in cards:
         total += get_card_points(card, card.suit == trump)
@@ -73,7 +73,7 @@ def get_total_points(cards, trump):
         if cards[0].value in normal_order[:4]:
             total_roem += 100
 
-    if total_roem > 0:
+    if total_roem > 0 and print_roem:
         print("Roem:", total_roem)
 
     return total + total_roem
